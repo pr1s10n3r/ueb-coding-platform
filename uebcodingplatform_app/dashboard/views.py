@@ -4,7 +4,6 @@ from .forms import UploadFileForm
 import zipfile, os, docker, os.path, shutil
 
 def index(req):
-    print('Hola hola')
     if req.method =='POST':
         form = UploadFileForm(req.POST, req.FILES)
         if form.is_valid():
@@ -15,7 +14,6 @@ def index(req):
             clean_dirs(name_app)
             return HttpResponseRedirect('success')
     else:
-        print('Nos jodimos')
         form = UploadFileForm()
 
     return render(req, 'dashboard/index.html', {'form': form})
