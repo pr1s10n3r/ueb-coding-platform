@@ -1,6 +1,14 @@
 <script>
   import Header from "./lib/Header.svelte";
   import LoaderPage from "./lib/LoaderPage.svelte";
+  import EvaluationCriteriaPage from "./lib/EvaluationCriteriaPage.svelte";
+  import ResultsPage from "./lib/ResultsPage.svelte";
+  import { activeTab, Headers } from "./stores/header";
+
+  let headerActiveTab = Headers.Loader;
+  activeTab.subscribe((value) => {
+    headerActiveTab = value;
+  });
 </script>
 
 <main>
@@ -8,7 +16,13 @@
 
   <div class="tab-wrapper">
     <div class="tab-item">
-      <LoaderPage />
+      {#if headerActiveTab == Headers.Loader}
+        <LoaderPage />
+      {:else if headerActiveTab == Headers.EvaluationCriteria}
+        <EvaluationCriteriaPage />
+      {:else if headerActiveTab == Headers.Results}
+        <ResultsPage />
+      {/if}
     </div>
   </div>
 </main>

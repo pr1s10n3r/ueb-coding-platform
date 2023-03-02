@@ -1,5 +1,6 @@
 <script>
   import { files, addFile } from "../stores/loader";
+  import { goToTabById, Headers } from "../stores/header";
 
   let filesCount = 0;
   let uploadedFiles = [];
@@ -38,6 +39,13 @@
         addFile(dtFiles[i]);
       }
     }
+  }
+
+  function onNextButtonPressed(evt) {
+    evt.preventDefault();
+
+    // TODO: Send files to server
+    goToTabById(Headers.EvaluationCriteria);
   }
 </script>
 
@@ -78,6 +86,7 @@
         dominio) del estudiante que desarrolló el código fuente.
       </p>
       <button
+        on:click={onNextButtonPressed}
         disabled={filesCount === 0}
         class="btn {filesCount > 0 ? 'btn-success' : ''}  btn-block"
         >Siguiente <i class="icon icon-arrow-right" /></button
