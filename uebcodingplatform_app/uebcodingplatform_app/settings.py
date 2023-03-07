@@ -26,31 +26,18 @@ SECRET_KEY = 'django-insecure-s77x5heh6of7z$esygjwwv20jk^(+s^--k&3yftw&cksz%_jhr
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '20.96.36.33'
+    '*'
 ]
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'dashboard',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'rest_framework',
+    'api'
 ]
 
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
+MIDDLEWARE = []
 
 ROOT_URLCONF = 'uebcodingplatform_app.urls'
 
@@ -72,7 +59,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'uebcodingplatform_app.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
@@ -81,6 +67,21 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+}
+
+REST_FRAMEWORK = {
+    "DEFAULT_RENDERER_CLASSES": [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [],
+    "DEFAULT_PERMISSION_CLASSES": [],
+    "UNAUTHENTICATED_USER": None,
+    'PAGE_SIZE': 10,
+    'DEFAULT_PAGINATION_CLASS': \
+        'rest_framework.pagination.LimitOffsetPagination',
+    'DEFAULT_FILTER_BACKENDS': [
+        'rest_framework.filters.OrderingFilter'
+    ],
 }
 
 
