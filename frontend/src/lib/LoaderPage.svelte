@@ -1,9 +1,10 @@
 <script>
-  import { files, addFile } from "../stores/loader";
+  import { files, addFile, clear } from "../stores/loader";
   import { goToTabById, Headers } from "../stores/header";
 
   let filesCount = 0;
   let uploadedFiles = [];
+  let invalidFileDragged = false;
 
   files.subscribe((value) => {
     uploadedFiles = value;
@@ -27,6 +28,8 @@
     evt.stopPropagation();
     evt.preventDefault();
 
+    invalidFileDragged = false;
+
     const dtFiles = evt.dataTransfer.files;
     for (let i = 0; i < dtFiles.length; i++) {
       const fileName = dtFiles[i].name;
@@ -37,6 +40,10 @@
         fileNameParts[fileNameParts.length - 1] === "java"
       ) {
         addFile(dtFiles[i]);
+      } else {
+        invalidFileDragged = true;
+        clear();
+        break;
       }
     }
   }
@@ -46,6 +53,11 @@
 
     // TODO: Send files to server
     goToTabById(Headers.EvaluationCriteria);
+  }
+
+  function onAlertCloseButtonPress(evt) {
+    evt.preventDefault();
+    invalidFileDragged = false;
   }
 </script>
 
@@ -72,6 +84,16 @@
           {/each}
         {/if}
       </div>
+
+      {#if invalidFileDragged}
+        <div class="toast toast-error">
+          <button
+            on:click={onAlertCloseButtonPress}
+            class="btn btn-clear float-right"
+          />
+          Recuerda subir únicamente archivos con extensión <b>.java</b>!
+        </div>
+      {/if}
     </div>
 
     <div class="divider-vert" />

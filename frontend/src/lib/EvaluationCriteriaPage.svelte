@@ -16,19 +16,27 @@
       <form>
         <div class="form-group">
           <label class="form-label" for="input-example-1"
-            >Tiempo de Ejecución Máximo</label
+            >Tiempo de Ejecución Máximo <span
+              class="form-hint tooltip"
+              data-tooltip="Unidad en segundos.">(?)</span
+            ></label
           >
           <input
             class="form-input"
             type="number"
             id="input-example-1"
             placeholder="En segundos"
+            min="1"
+            value="1"
           />
         </div>
 
         <div class="form-group">
           <label class="form-label" for="input-example-3"
-            >Entradas del Programa</label
+            >Entradas del Programa <span
+              class="form-hint tooltip"
+              data-tooltip="Serán enviadas al stdin del sistema.">(?)</span
+            ></label
           >
           <textarea
             class="form-input"
@@ -52,23 +60,27 @@
 
         <div class="form-group">
           <label class="form-label" for="input-example-1"
-            >Firma de la Función a Evaluar</label
+            >Nombre de Función a Evaluar <span
+              class="form-hint tooltip"
+              data-tooltip="Únicamente el nombre, no la firma.">(?)</span
+            ></label
           >
           <input
             class="form-input"
             type="text"
             id="input-example-1"
-            placeholder="static void quickSort(int[] arr, int low, int high)"
+            placeholder="quickSort"
           />
         </div>
 
         <div class="form-group">
           <label class="form-label" for="input-example-1"
-            >Complejidad Algorítica Deseada para la Función a Evaluar</label
+            >Complejidad Algorítmica Deseada para la Función a Evaluar</label
           >
           <select class="form-select">
             <option>O(1)</option>
             <option>O(n)</option>
+            <option>O(n^2)</option>
             <option>O(log n)</option>
             <option>O(n log n)</option>
           </select>
@@ -87,8 +99,12 @@
       </p>
 
       <ul>
-        <li>Tiempo de ejecución máximo permitido.</li>
-        <li>Salidas de un programa dado unas entradas.</li>
+        <li>
+          Tiempo de ejecución máximo permitido <span class="text-bold"
+            >en segundos</span
+          >.
+        </li>
+        <li>Salidas deseadas de un programa dado unas entradas.</li>
         <li>Complejidad algorítimica de una función dada su firma.</li>
       </ul>
 
@@ -100,3 +116,10 @@
     </div>
   </div>
 </div>
+
+<style>
+  .form-hint {
+    font-weight: bold;
+    cursor: pointer;
+  }
+</style>

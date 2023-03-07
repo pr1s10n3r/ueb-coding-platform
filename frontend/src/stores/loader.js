@@ -8,3 +8,7 @@ export function addFile(file) {
     return list;
   });
 }
+
+export function clear() {
+  files.set([]);
+}
