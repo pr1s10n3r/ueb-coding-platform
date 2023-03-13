@@ -1,20 +1,12 @@
 <script>
-  import { files, addFile, clear } from "../stores/loader";
   import { goToTabById, Headers } from "../stores/header";
+  import { setFiles } from "../stores/request";
 
   let filesCount = 0;
   let uploadedFiles = [];
   let invalidFileDragged = false;
 
-  files.subscribe((value) => {
-    uploadedFiles = value;
-    filesCount = value.length;
-  });
-
   function onDragEnter(evt) {
-    files.set([]);
-    filesCount = 0;
-
     evt.stopPropagation();
     evt.preventDefault();
   }
@@ -39,19 +31,22 @@
         fileNameParts.length > 1 &&
         fileNameParts[fileNameParts.length - 1] === "java"
       ) {
-        addFile(dtFiles[i]);
+        uploadedFiles.push(dtFiles[i]);
+        filesCount++;
       } else {
         invalidFileDragged = true;
-        clear();
+        uploadedFiles = [];
         break;
       }
+    }
+
+    if (!invalidFileDragged) {
+      setFiles(uploadedFiles);
     }
   }
 
   function onNextButtonPressed(evt) {
     evt.preventDefault();
-
-    // TODO: Send files to server
     goToTabById(Headers.EvaluationCriteria);
   }
 
@@ -70,7 +65,7 @@
         on:drop={onFileDropped}
         on:dragover={onDragOver}
       >
-        {#if filesCount === 0}
+        {#if uploadedFiles.length === 0}
           <div class="empty-icon">
             <i class="icon icon-link" />
           </div>

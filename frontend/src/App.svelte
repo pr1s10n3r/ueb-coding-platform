@@ -3,6 +3,7 @@
   import LoaderPage from "./lib/LoaderPage.svelte";
   import EvaluationCriteriaPage from "./lib/EvaluationCriteriaPage.svelte";
   import ResultsPage from "./lib/ResultsPage.svelte";
+  import Footer from "./lib/Footer.svelte";
   import { activeTab, Headers } from "./stores/header";
 
   let headerActiveTab = Headers.Loader;
@@ -25,12 +26,14 @@
       {/if}
     </div>
   </div>
+
+  <Footer />
 </main>
 
 <style>
   .tab-wrapper {
     width: 100%;
-    height: calc(100vh - 61px);
+    height: calc(100vh - 110px);
 
     display: flex;
     align-items: center;

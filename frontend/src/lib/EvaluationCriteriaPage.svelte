@@ -1,10 +1,22 @@
 <script>
   import { goToTabById, Headers } from "../stores/header";
+  import { setEvaluationCriteria } from "../stores/request";
+
+  let expectedTimeField = 0,
+    inputFormField = "",
+    expectedOutputField = "",
+    funcName = "",
+    funcExpectedComplexity = "";
 
   function onSubmitEvaluationCriteria(evt) {
     evt.preventDefault();
 
-    // TODO: Send evaluation criteria to server
+    setEvaluationCriteria(
+      inputFormField,
+      funcExpectedComplexity,
+      expectedTimeField,
+      funcName
+    );
 
     goToTabById(Headers.Results);
   }
@@ -22,13 +34,16 @@
             ></label
           >
           <input
+            bind:value={expectedTimeField}
             class="form-input"
             type="number"
             id="input-example-1"
             placeholder="En segundos"
-            min="1"
-            value="1"
+            min="0"
           />
+          <p class="text-muted">
+            Si es cero, no se evaluará el tiempo de ejecución.
+          </p>
         </div>
 
         <div class="form-group">
@@ -39,6 +54,7 @@
             ></label
           >
           <textarea
+            bind:value={inputFormField}
             class="form-input"
             id="input-example-3"
             placeholder="10 8 5 54 1 2 7 87"
@@ -51,6 +67,7 @@
             >Salida Deseada del Programa</label
           >
           <textarea
+            bind:value={expectedOutputField}
             class="form-input"
             id="input-example-3"
             placeholder="1 2 5 7 8 10 54 87"
@@ -66,6 +83,7 @@
             ></label
           >
           <input
+            bind:value={funcName}
             class="form-input"
             type="text"
             id="input-example-1"
@@ -77,12 +95,16 @@
           <label class="form-label" for="input-example-1"
             >Complejidad Algorítmica Deseada para la Función a Evaluar</label
           >
-          <select class="form-select">
-            <option>O(1)</option>
-            <option>O(n)</option>
-            <option>O(n^2)</option>
-            <option>O(log n)</option>
-            <option>O(n log n)</option>
+          <select
+            class="form-select"
+            bind:value={funcExpectedComplexity}
+            disabled={funcName === ""}
+          >
+            <option value="constant">O(1)</option>
+            <option value="linear">O(n)</option>
+            <option value="cuadratic">O(n^2)</option>
+            <option value="logarithmic">O(log n)</option>
+            <option value="linearhythmic">O(n log n)</option>
           </select>
         </div>
       </form>
@@ -107,6 +129,11 @@
         <li>Salidas deseadas de un programa dado unas entradas.</li>
         <li>Complejidad algorítimica de una función dada su firma.</li>
       </ul>
+
+      <p>
+        Si un parámetro no es establecido, no se tomará en cuenta durante el
+        proceso de evaluación.
+      </p>
 
       <button
         on:click={onSubmitEvaluationCriteria}
