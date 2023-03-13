@@ -26,10 +26,10 @@ class Complexity:
         conditionals = java_program.count("if")
 
         if loops == 0 and conditionals == 0:
-            return "O(1)"
+            return "constant"
         elif loops == 1 and conditionals == 0:
-            return "O(n)"
+            return "linear"
         elif loops > 1 and conditionals == 0:
-            return "O(n^2)"
+            return "quadratic"
         else:
-            return "O(n log n)"
+            return "Nlogarithmic"

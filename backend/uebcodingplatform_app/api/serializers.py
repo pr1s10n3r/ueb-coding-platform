@@ -2,7 +2,16 @@ from rest_framework import serializers
 
 class DummySerializer(serializers.Serializer):
     file = serializers.FileField()
-    input = serializers.CharField()
+    time = serializers.FloatField()
+    input = serializers.CharField(max_length=200)
     complexity = serializers.ChoiceField(
-            choices=['LogN', 'NLogN', 'N*N'])
+            choices=[
+                'constant', 
+                'logarithmic', 
+                'linear',
+                'Nlogarithmic',
+                'quadratic',
+                'cubic',
+                'polynomial'
+            ])
     function = serializers.CharField(max_length=200)
