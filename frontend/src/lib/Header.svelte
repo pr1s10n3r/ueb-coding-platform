@@ -1,5 +1,5 @@
 <script>
-  import { Headers, goToTabById, activeTab } from "../stores/header";
+  import { activeTab } from "../stores/header";
 
   let headerActiveTab = 0;
 

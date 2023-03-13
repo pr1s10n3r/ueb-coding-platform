@@ -1,9 +1,0 @@
-.dashboard__form {
-    width: 50%;
-}
-
-@media screen and (max-width: 992px) {
-    .dashboard__form {
-        width: 100%;
-    }
-}
