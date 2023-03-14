@@ -4,7 +4,7 @@ class Complexity:
         stack = []
         program = []
         f = open(filename, "r")
-        
+
         line = f.readline()
         while not target_func in line and line != "":
             line = f.readline()
@@ -20,6 +20,7 @@ class Complexity:
             if len(stack) == 0:
                 break
             line = f.readline()
+        f.close()
 
         java_program = "".join(program)
         loops = java_program.count("for") + java_program.count("while")
