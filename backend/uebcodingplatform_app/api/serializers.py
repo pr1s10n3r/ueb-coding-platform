@@ -4,12 +4,10 @@ class DummySerializer(serializers.Serializer):
     complexity = serializers.ChoiceField(
             choices=[
                 'constant', 
-                'logarithmic', 
                 'linear',
-                'Nlogarithmic',
+                'linearithmic',
                 'quadratic',
-                'cubic',
-                'polynomial'
+                'cubic'
             ])
     file = serializers.FileField()
     function = serializers.CharField(max_length=200)
