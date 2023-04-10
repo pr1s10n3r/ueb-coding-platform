@@ -5,7 +5,7 @@ class Organizer:
 
     filename = "main.java"
     tmpdir = "/tmp/"
-    dtformat = ("%Y%m%d%H%M%S")
+    dtformat = ("%Y%m%d%H%M%S%f")
 
     def resolve(self, file):
         now = datetime.datetime.now()
@@ -16,5 +16,5 @@ class Organizer:
             fs = FileSystemStorage(location=folder_path)
             fs.save(self.filename, file)
         except:
-            print("Something was wrong trying to save the file")
+            print("Something was wrong trying to save the file.")
         return (folder_path, self.filename)
