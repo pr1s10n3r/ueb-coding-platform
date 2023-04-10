@@ -1,3 +1,7 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 class Quicksort {
     static void swap(int[] arr, int i, int j) {
         int temp = arr[i];
@@ -28,13 +32,20 @@ class Quicksort {
         }
     }
 
-    public static void main(String[] args) {
-        int arr[] = {10, 7, 8, 9, 1, 5};
+    public static void main(String[] args) throws IOException {        
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        final String consoleInput = reader.readLine();
+        
+        final String[] tokens = consoleInput.split(" ");
+        int[] arr = new int[tokens.length];
+        for (int i = 0; i < tokens.length; i++) {
+        	arr[i] = Integer.parseInt(tokens[i]);
+        }
+        
         int len = arr.length;
 
         quickSort(arr, 0, len - 1);
 
-        System.out.println("Array sorted:");
         for (int i = 0; i < len; i++) {
             System.out.print(arr[i]);
             if (i < len - 1) {

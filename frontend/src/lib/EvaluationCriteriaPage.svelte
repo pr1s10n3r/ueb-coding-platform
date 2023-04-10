@@ -13,6 +13,7 @@
 
     setEvaluationCriteria(
       inputFormField,
+      expectedOutputField,
       funcExpectedComplexity,
       expectedTimeField,
       funcName
@@ -27,7 +28,7 @@
     <div class="column col-6">
       <form>
         <div class="form-group">
-          <label class="form-label" for="input-example-1"
+          <label class="form-label" for="input-expected-runtime"
             >Tiempo de Ejecución Máximo <span
               class="form-hint tooltip"
               data-tooltip="Unidad en segundos.">(?)</span
@@ -37,7 +38,7 @@
             bind:value={expectedTimeField}
             class="form-input"
             type="number"
-            id="input-example-1"
+            id="input-expected-runtime"
             placeholder="En segundos"
             min="0"
           />
@@ -47,7 +48,7 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="input-example-3"
+          <label class="form-label" for="input-stdin-input"
             >Entradas del Programa <span
               class="form-hint tooltip"
               data-tooltip="Serán enviadas al stdin del sistema.">(?)</span
@@ -56,27 +57,27 @@
           <textarea
             bind:value={inputFormField}
             class="form-input"
-            id="input-example-3"
+            id="input-stdin-input"
             placeholder="10 8 5 54 1 2 7 87"
             rows="2"
           />
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="input-example-3"
+          <label class="form-label" for="input-expected-output"
             >Salida Deseada del Programa</label
           >
           <textarea
             bind:value={expectedOutputField}
             class="form-input"
-            id="input-example-3"
+            id="input-expected-output"
             placeholder="1 2 5 7 8 10 54 87"
             rows="2"
           />
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="input-example-1"
+          <label class="form-label" for="input-func-name"
             >Nombre de Función a Evaluar <span
               class="form-hint tooltip"
               data-tooltip="Únicamente el nombre, no la firma.">(?)</span
@@ -86,16 +87,17 @@
             bind:value={funcName}
             class="form-input"
             type="text"
-            id="input-example-1"
+            id="input-func-name"
             placeholder="quickSort"
           />
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="input-example-1"
+          <label class="form-label" for="input-expected-complexity"
             >Complejidad Algorítmica Deseada para la Función a Evaluar</label
           >
           <select
+            id="input-expected-complexity"
             class="form-select"
             bind:value={funcExpectedComplexity}
             disabled={funcName === ""}
