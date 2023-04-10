@@ -2,6 +2,8 @@
   import { onMount } from "svelte";
   import axios from "axios";
   import { reqFormData } from "../stores/request";
+  import { setError } from "../stores/error";
+  import { goToTabById, Headers } from "../stores/header";
 
   let loading = true;
 
@@ -11,17 +13,22 @@
   });
 
   onMount(async () => {
-    const { status, data } = await axios.post(
-      `${import.meta.env.VITE_BACKEND_BASE_URL}/api/dummy`,
-      reqFd,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      }
-    );
+    try {
+      const { status, data } = await axios.post(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/dummy/`,
+        reqFd,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
-    if (status !== 200) {
-      // TODO: Handle error
-      console.error(`bad response from server: ${status}: ${data}`);
+      if (status !== 200) {
+        // TODO: Handle error
+        console.error(`bad response from server: ${status}: ${data}`);
+      }
+    } catch (err) {
+      setError(err.message);
+      goToTabById(Headers.Error);
     }
   });
 
