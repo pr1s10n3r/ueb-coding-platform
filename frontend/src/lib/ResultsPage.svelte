@@ -80,11 +80,23 @@
         {#each success as s}
           <tr class="active">
             <td>{s.name}</td>
-            <td>{s.time.actual}</td>
+            <td
+              class={s.time.expected === s.time.actual
+                ? "text-success"
+                : "text-error"}>{s.time.actual}</td
+            >
             <td>{s.output.expected}</td>
-            <td>{s.output.actual}</td>
+            <td
+              class={s.output.expected === s.output.actual
+                ? "text-success"
+                : "text-error"}>{s.output.actual}</td
+            >
             <td>{s.complexity.expected}</td>
-            <td>{s.complexity.actual}</td>
+            <td
+              class={s.complexity.expected === s.complexity.actual
+                ? "text-success"
+                : "text-error"}>{s.complexity.actual}</td
+            >
           </tr>
         {/each}
       </tbody>

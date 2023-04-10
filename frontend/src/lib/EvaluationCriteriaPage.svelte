@@ -105,7 +105,6 @@
             <option value="constant">O(1)</option>
             <option value="linear">O(n)</option>
             <option value="cuadratic">O(n^2)</option>
-            <option value="logarithmic">O(log n)</option>
             <option value="linearhythmic">O(n log n)</option>
           </select>
         </div>
