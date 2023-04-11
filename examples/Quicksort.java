@@ -49,10 +49,8 @@ class Quicksort {
         for (int i = 0; i < len; i++) {
             System.out.print(arr[i]);
             if (i < len - 1) {
-                System.out.print(", ");
+                System.out.print(" ");
             }
         }
-
-        System.out.println();
     }
 }

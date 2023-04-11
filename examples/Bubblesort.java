@@ -1,6 +1,8 @@
-package me.astagg;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
-public class BubbleSort<T> {
+public class Bubblesort {
 	static int[] bubbleSort(int[] arr) {
 		int[] sorted = arr;
 
@@ -17,23 +19,26 @@ public class BubbleSort<T> {
 		return sorted;
 	}
 
-	static void printArray(String msg, int[] arr) {
-		System.out.println(msg);
-		
+	static void printArray(int[] arr) {
 		for (int i = 0; i < arr.length; i++) {
 			System.out.print(arr[i]);
 			if (i < arr.length - 1) {
-				System.out.print(", ");
+				System.out.print(" ");
 			}
 		}
-
-		System.out.println();
 	}
 
-	public static void main(String[] args) {
-		int[] arr = { 0, 6, 5, 1, 2, 83, 55, 100, 662, -1, 7 };
-		printArray("Before bubble sort:", arr);
+	public static void main(String[] args) throws IOException {
+		final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        final String consoleInput = reader.readLine();
+
+		final String[] tokens = consoleInput.split(" ");
+        int[] arr = new int[tokens.length];
+        for (int i = 0; i < tokens.length; i++) {
+        	arr[i] = Integer.parseInt(tokens[i]);
+        }
+
 		int[] sorted = bubbleSort(arr);
-		printArray("After bubble sort:", sorted);
+		printArray(sorted);
 	}
 }

@@ -1,10 +1,18 @@
 <script>
   import { reqError } from "../stores/error";
+  import { clearRequestData } from "../stores/request";
+  import { goToTabById, Headers } from "../stores/header";
 
   let displayError = "";
   reqError.subscribe((value) => {
     displayError = value.trim();
   });
+
+  function onBackToStart(evt) {
+    evt.preventDefault();
+    clearRequestData(); // Just in case
+    goToTabById(Headers.Loader);
+  }
 </script>
 
 <div class="container">
@@ -15,6 +23,10 @@
     // Envía esto a tu administrador del sistema.
     {displayError}
   </textarea>
+
+  <button on:click={onBackToStart} class="mt-2 btn btn-primary btn-block"
+    >Volver al Inicio</button
+  >
 </div>
 
 <style>

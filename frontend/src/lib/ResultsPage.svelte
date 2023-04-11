@@ -44,6 +44,7 @@
         success.push(data);
       }
     } catch (err) {
+      console.error(err);
       setError(err.message);
       goToTabById(Headers.Error);
     }
@@ -81,19 +82,22 @@
           <tr class="active">
             <td>{s.name}</td>
             <td
-              class={s.time.expected === s.time.actual
-                ? "text-success"
-                : "text-error"}>{s.time.actual}</td
+              class={s.time.expected > 0 &&
+              s.time.actual / 1000 > s.time.expected
+                ? "text-error"
+                : "text-success"}>{s.time.actual / 1000}s</td
             >
             <td>{s.output.expected}</td>
             <td
-              class={s.output.expected === s.output.actual
+              class={s.output.expected !== "" &&
+              s.output.expected === s.output.actual
                 ? "text-success"
                 : "text-error"}>{s.output.actual}</td
             >
             <td>{s.complexity.expected}</td>
             <td
-              class={s.complexity.expected === s.complexity.actual
+              class={s.complexity.expected !== "" &&
+              s.complexity.expected === s.complexity.actual
                 ? "text-success"
                 : "text-error"}>{s.complexity.actual}</td
             >
