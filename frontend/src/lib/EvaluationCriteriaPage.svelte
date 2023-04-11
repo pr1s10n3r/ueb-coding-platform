@@ -104,8 +104,8 @@
           >
             <option value="constant">O(1)</option>
             <option value="linear">O(n)</option>
-            <option value="cuadratic">O(n^2)</option>
-            <option value="linearhythmic">O(n log n)</option>
+            <option value="quadratic">O(n^2)</option>
+            <option value="linearithmic">O(n log n)</option>
           </select>
         </div>
       </form>
