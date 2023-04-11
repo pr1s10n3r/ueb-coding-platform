@@ -41,9 +41,10 @@
         console.error(`bad response from server: ${status}: ${data}`);
       } else {
         data.name = file.name;
-        success.push(data);
+        success = [...success, data];
       }
     } catch (err) {
+      error = [...error, err];
       console.error(err);
       setError(err.message);
       goToTabById(Headers.Error);
@@ -55,7 +56,6 @@
     for (const rFile of reqFiles) {
       await sendToServer(reqFd, rFile);
     }
-
     loading = false;
   });
 </script>
@@ -63,7 +63,7 @@
 <div class="container">
   <h1>Tus Resultados</h1>
 
-  {#if loading}
+  {#if success.length === 0}
     <p>Estamos cargando...</p>
   {:else}
     <table class="table table-striped table-hover">
@@ -105,6 +105,10 @@
         {/each}
       </tbody>
     </table>
+
+    {#if loading}
+      <div class="loading loading-lg" />
+    {/if}
 
     <div class="controls mt-2 float-right">
       <button on:click={onQualifyOtherBatch} class="btn"
