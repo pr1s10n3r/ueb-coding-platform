@@ -2,10 +2,10 @@
 django_project_name = "uebcodingplatform_app"
 
 # Chdir to specified directory before apps loading
-chdir = "/home/haku/ueb-coding-platform/uebcodingplatform_app"
+chdir = "/home/haku/ueb-coding-platform/backend/uebcodingplatform_app"
 
 # The socket to bind to
-bind = ":4001"
+bind = ":8080"
 
 # The class of worker processes for handling requests
 worker_class = "sync"
