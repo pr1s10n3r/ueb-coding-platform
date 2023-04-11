@@ -16,9 +16,14 @@ export function setFiles(files) {
   });
 }
 
-export function setEvaluationCriteria(input, complexity, time, func) {
+export function clearRequestData() {
+  reqFormData.set(new FormData());
+}
+
+export function setEvaluationCriteria(input, output, complexity, time, func) {
   reqFormData.update((fd) => {
     fd.append("input", input);
+    fd.append("output", output);
     fd.append("complexity", complexity);
     fd.append("time", time);
     fd.append("function", func);

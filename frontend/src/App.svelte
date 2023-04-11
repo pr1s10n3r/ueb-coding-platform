@@ -4,6 +4,7 @@
   import EvaluationCriteriaPage from "./lib/EvaluationCriteriaPage.svelte";
   import ResultsPage from "./lib/ResultsPage.svelte";
   import Footer from "./lib/Footer.svelte";
+  import ErrorPage from "./lib/ErrorPage.svelte";
   import { activeTab, Headers } from "./stores/header";
 
   let headerActiveTab = Headers.Loader;
@@ -23,6 +24,8 @@
         <EvaluationCriteriaPage />
       {:else if headerActiveTab == Headers.Results}
         <ResultsPage />
+      {:else if headerActiveTab == Headers.Error}
+        <ErrorPage />
       {/if}
     </div>
   </div>
