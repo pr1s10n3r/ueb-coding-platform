@@ -140,20 +140,21 @@ class Complexity:
                 return True
         return False
     
-    def loops_depth(self, block):
+    def loops_depth(self, loop:  For | While | DoWhile | ForEach):
         infinite_loop = False
         depth = 0
-        for statement in block.statements:
-            if isinstance(statement, IfThenElse):
-                depth += self.loops_depth(statement.if_true)
-                if statement.if_false is not None:
-                    depth += self.loops_depth(statement.if_false)
-            elif isinstance(statement, For) or isinstance(statement, While) or isinstance(statement, DoWhile) or isinstance(statement, ForEach):
-                if not self.infinity_loop(statement):
-                    depth += 1
-                    depth += self.loops_depth(statement.body)
-                else: 
-                    infinite_loop = True
+        if isinstance(loop.body, Block):
+            for statement in loop.body.statements:
+                if isinstance(statement, IfThenElse):
+                    depth += self.loops_depth(statement.if_true)
+                    if statement.if_false is not None:
+                        depth += self.loops_depth(statement.if_false)
+                elif isinstance(statement, For) or isinstance(statement, While) or isinstance(statement, DoWhile) or isinstance(statement, ForEach):
+                    if not self.infinity_loop(statement):
+                        depth += 1
+                        depth += self.loops_depth(statement.body)
+                    else: 
+                        infinite_loop = True
         return infinite_loop, depth
     
     def calculate_complexity(self, method: ClassDeclaration):
@@ -164,8 +165,10 @@ class Complexity:
             if isinstance(statement, For) or isinstance(statement, DoWhile) or isinstance(statement, While) or isinstance(statement, ForEach):
                 if self.infinity_loop(statement):
                     return 'error: infinite loop detected'
-                
-                infinite_loop, depth = self.loops_depth(statement.body) + 1
+            
+                infinite_loop, depth = self.loops_depth(statement)
+                depth += 1
+
                 if infinite_loop: 
                     return 'error: infinite loop detected'
                 
