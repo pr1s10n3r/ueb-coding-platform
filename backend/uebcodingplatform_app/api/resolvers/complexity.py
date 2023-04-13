@@ -140,22 +140,50 @@ class Complexity:
                 return True
         return False
     
-    def loops_depth(self, loop:  For | While | DoWhile | ForEach):
-        infinite_loop = False
+    def check_infinity_loop(self, loop: Block | For | While | DoWhile | ForEach):
+        if isinstance(loop, Block):
+            for statement in loop.statements:
+                if isinstance(statement, IfThenElse):
+                    if statement.if_false is not None:
+                        self.loops_depth(statement.if_false)
+                elif isinstance(statement, (For, ForEach, While, DoWhile)):
+                    if self.infinity_loop(statement):
+                        return True
+                    self.loops_depth(statement.body)
+        elif isinstance(loop.body, Block):
+            for statement in loop.body.statements:
+                if isinstance(statement, IfThenElse):
+                    self.loops_depth(statement.if_true)
+                    if statement.if_false is not None:
+                        self.loops_depth(statement.if_false)
+                elif isinstance(statement, (For, ForEach, While, DoWhile)):
+                    if self.infinity_loop(statement):
+                        return True
+                    self.loops_depth(statement.body)
+        return False
+
+    def loops_depth(self, loop: Block | For | While | DoWhile | ForEach):
         depth = 0
-        if isinstance(loop.body, Block):
+        if isinstance(loop, Block):
+            for statement in loop.statements:
+                if isinstance(statement, IfThenElse):
+                    depth += self.loops_depth(statement.if_true)
+                    if statement.if_false is not None:
+                        depth += self.loops_depth(statement.if_false)
+                elif isinstance(statement, (For, ForEach, While, DoWhile)):
+                    depth += 1
+                    depth += self.loops_depth(statement.body)
+        elif isinstance(loop.body, Block):
             for statement in loop.body.statements:
                 if isinstance(statement, IfThenElse):
                     depth += self.loops_depth(statement.if_true)
                     if statement.if_false is not None:
                         depth += self.loops_depth(statement.if_false)
-                elif isinstance(statement, For) or isinstance(statement, While) or isinstance(statement, DoWhile) or isinstance(statement, ForEach):
-                    if not self.infinity_loop(statement):
-                        depth += 1
-                        depth += self.loops_depth(statement.body)
-                    else: 
-                        infinite_loop = True
-        return infinite_loop, depth
+                elif isinstance(statement, (For, ForEach, While, DoWhile)):
+                    depth += 1
+                    depth += self.loops_depth(statement.body)
+                    
+        return depth
     
     def calculate_complexity(self, method: ClassDeclaration):
         statement_complexity_lst = []
@@ -163,14 +191,10 @@ class Complexity:
             is_log = False
             depth = 0
             if isinstance(statement, For) or isinstance(statement, DoWhile) or isinstance(statement, While) or isinstance(statement, ForEach):
-                if self.infinity_loop(statement):
+                if self.infinity_loop(statement) or self.check_infinity_loop(statement):
                     return 'error: infinite loop detected'
             
-                infinite_loop, depth = self.loops_depth(statement)
-                depth += 1
-
-                if infinite_loop: 
-                    return 'error: infinite loop detected'
+                depth = self.loops_depth(statement) + 1
                 
                 if depth == 1 and len(statement.update) == 1:
                     if isinstance(statement.update[0], Unary):
