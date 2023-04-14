@@ -5,13 +5,16 @@ export const reqSourceFiles = writable([]);
 
 export function addSourceFile(file) {
   reqSourceFiles.update((files) => {
-    files.push(file);
+    files = [...files, file];
+    console.log("File added");
     return files;
   });
 }
 
 export function clearSourceFiles() {
+  console.log("clearSourceFiles");
   reqSourceFiles.set([]);
+  reqFormData.set(new FormData());
 }
 
 export function setFiles(files) {

@@ -11,6 +11,8 @@
 
   let reqFd = null;
   reqFormData.subscribe((value) => {
+    console.log("Request Form:", value);
+    console.log("Request Form Files:", value.getAll("files"));
     reqFd = value;
   });
 
@@ -53,7 +55,9 @@
 
   onMount(async () => {
     const reqFiles = reqFd.getAll("file");
+    console.log(`Request Files: ${reqFiles.length}`);
     for (const rFile of reqFiles) {
+      console.log("Sending to server...");
       await sendToServer(reqFd, rFile);
     }
     loading = false;
