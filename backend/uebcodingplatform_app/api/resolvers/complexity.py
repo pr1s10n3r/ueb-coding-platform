@@ -28,6 +28,16 @@ class Complexity:
             if isinstance(method, MethodDeclaration):
                 self.methods_created_by_user.append(method.name)
 
+    def get_method_args(self, method: MethodInvocation):
+        methods = []
+        for argument in method.arguments:
+            if isinstance(argument, MethodInvocation):
+                if argument.name in self.methods_created_by_user:
+                    methods.append(argument.name)
+                methods_nested = self.get_method_args(argument)
+                methods = concat(methods, methods_nested)
+        return methods
+
     def get_method_variable(self, variable: VariableDeclaration):
         methods = []
         for variablede_declarator in variable.variable_declarators:
@@ -35,13 +45,15 @@ class Complexity:
                 if isinstance(variablede_declarator.initializer, MethodInvocation):
                     if variablede_declarator.initializer.name in self.methods_created_by_user:
                         methods.append(variablede_declarator.initializer.name)
+                    methods_nested = self.get_method_args(variablede_declarator.initializer)
+                    methods = concat(methods, methods_nested)
         return methods
 
     def get_methods_if(self, statement: IfThenElse):
         methods = []
         if isinstance(statement.if_true, Block):
             for true_statement in statement.if_true.statements:    
-                if isinstance(true_statement, For) or isinstance(true_statement, DoWhile) or isinstance(true_statement, While) or isinstance(true_statement, ForEach):
+                if isinstance(true_statement, (For, ForEach, While, DoWhile)):
                     methods_nested = self.get_methods_loops(true_statement)
                     methods = concat(methods, methods_nested)
                 elif isinstance(true_statement, IfThenElse):
@@ -56,31 +68,37 @@ class Complexity:
         elif isinstance(statement.if_true, MethodInvocation):
             if statement.if_true.name in self.methods_created_by_user:
                 methods.append(statement.if_true.name)
+            methods_nested = self.get_method_args(statement.if_true)
+            methods = concat(methods, methods_nested)
         
         if isinstance(statement.if_false, Block):
             for false_statement in statement.if_true.statements:    
-                if isinstance(false_statement, For) or isinstance(false_statement, DoWhile) or isinstance(false_statement, While) or isinstance(false_statement, ForEach):
+                if isinstance(false_statement, (For, ForEach, While, DoWhile)):
                     methods_nested = self.get_methods_loops(false_statement)
                     methods = concat(methods, methods_nested)
                 elif isinstance(false_statement, IfThenElse):
                     methods_nested = self.get_methods_if(false_statement)
                     methods = concat(methods, methods_nested)
-                elif isinstance(true_statement, VariableDeclaration):
-                    methods_nested = self.get_method_variable(true_statement)
+                elif isinstance(false_statement, VariableDeclaration):
+                    methods_nested = self.get_method_variable(false_statement)
                     methods = concat(methods, methods_nested)
                 elif isinstance(false_statement, MethodInvocation):
                     if false_statement.name in self.methods_created_by_user:
                         methods.append(false_statement.name)
+                    methods_nested = self.get_method_args(false_statement)
+                    methods = concat(methods, methods_nested)
         elif isinstance(statement.if_false, MethodInvocation):
             if statement.if_false.name in self.methods_created_by_user:
                 methods.append(statement.if_false.name)
+            methods_nested = self.get_method_args(statement.if_false)
+            methods = concat(methods, methods_nested)
         return methods
         
     def get_methods_loops(self, loop: For | While | DoWhile | ForEach):
         methods = []
         if isinstance(loop.body, Block):
             for loop_statement in loop.body.statements:
-                if isinstance(loop_statement, For) or isinstance(loop_statement, DoWhile) or isinstance(loop_statement, While) or isinstance(loop_statement, ForEach):
+                if isinstance(loop_statement, (For, ForEach, While, DoWhile)):
                     methods_nested = self.get_methods_loops(loop_statement)
                     methods = concat(methods, methods_nested)
                 elif isinstance(loop_statement, IfThenElse):
@@ -92,15 +110,19 @@ class Complexity:
                 elif isinstance(loop_statement, MethodInvocation):
                     if loop_statement.name in self.methods_created_by_user:
                         methods.append(loop_statement.name)
+                    methods_nested = self.get_method_args(loop_statement)
+                    methods = concat(methods, methods_nested)
         elif isinstance(loop.body, MethodInvocation):
             if loop.body.name in self.methods_created_by_user:
                 methods.append(loop.body.name)
+            methods_nested = self.get_method_args(loop.body)
+            methods = concat(methods, methods_nested)
         return methods
 
     def get_dependencies(self, method: MethodDeclaration):
         dependencies = []
         for statement in method.body:
-            if isinstance(statement, For) or isinstance(statement, DoWhile) or isinstance(statement, While) or isinstance(statement, ForEach):
+            if isinstance(statement, (For, ForEach, While, DoWhile)):
                 dependencies_nested = self.get_methods_loops(statement)
                 dependencies = concat(dependencies, dependencies_nested)
             elif isinstance(statement, IfThenElse):
@@ -112,7 +134,9 @@ class Complexity:
             elif isinstance(statement, MethodInvocation):
                 if statement.name in self.methods_created_by_user:
                     dependencies.append(statement.name)
-        self.dependencies[method.name] = dependencies
+                dependencies_nested = self.get_method_args(statement)
+                dependencies = concat(dependencies, dependencies_nested)
+        self.dependencies[method.name] = list(set(dependencies))
 
     def circular_dependency(self):
         for method in self.methods_created_by_user:
@@ -161,7 +185,14 @@ class Complexity:
                         return True
                     self.loops_depth(statement.body)
         return False
-
+    
+    def is_logarithmic(self, statement: For):
+        return statement.update[0].operator == '/=' or statement.update[0].operator == '*=' \
+            or (statement.update[0].operator == '=' and isinstance(statement.update[0].rhs, Multiplicative) and statement.update[0].rhs.operator == '*') \
+            or (statement.update[0].operator == '=' and isinstance(statement.update[0].rhs, Multiplicative) and statement.update[0].rhs.operator == '/') \
+            or (statement.update[0].operator == '+=' and isinstance(statement.update[0].rhs, Multiplicative) and statement.update[0].rhs.operator == '*') \
+            or (statement.update[0].operator == '-=' and isinstance(statement.update[0].rhs, Multiplicative) and statement.update[0].rhs.operator == '/')
+    
     def loops_depth(self, loop: Block | For | While | DoWhile | ForEach):
         depth = 0
         if isinstance(loop, Block):
@@ -190,35 +221,26 @@ class Complexity:
         for statement in method.body:
             is_log = False
             depth = 0
-            if isinstance(statement, For) or isinstance(statement, DoWhile) or isinstance(statement, While) or isinstance(statement, ForEach):
+            if isinstance(statement, (For, ForEach, While, DoWhile)):
                 if self.infinity_loop(statement) or self.check_infinity_loop(statement):
                     return 'error: infinite loop detected'
-            
-                depth = self.loops_depth(statement) + 1
-                
-                if depth == 1 and len(statement.update) == 1:
-                    if isinstance(statement.update[0], Unary):
-                        if statement.update[0].sign != 'x++' and statement.update[0].sign != 'x--':
-                            is_log = True
-                    if isinstance(statement.update[0], Assignment):
-                        if statement.update[0].operator != '+=' and statement.update[0].operator != '-=':
-                            is_log = True
-                elif depth == 2 and len(statement.update) == 1:
-                    if isinstance(statement.update[0], Unary):
-                        if statement.update[0].sign != 'x++' and statement.update[0].sign != 'x--':
-                            is_log = True
-                    if isinstance(statement.update[0], Assignment):
-                        if statement.update[0].operator != '+=' and statement.update[0].operator != '-=':
-                            is_log = True
-                    if isinstance(statement.body, Block):
-                        for statement_nested in statement.body:
-                            if isinstance(statement_nested, For) or isinstance(statement_nested, DoWhile) or isinstance(statement_nested, While) or isinstance(statement_nested, ForEach):        
-                                if isinstance(statement_nested.update[0], Unary) and len(statement_nested.update) == 1:
-                                    if statement_nested.update[0].sign != 'x++' and statement_nested.update[0].sign != 'x--':
-                                        is_log = True
-                                if isinstance(statement_nested.update[0], Assignment) and len(statement_nested.update) == 1:
-                                    if statement_nested.update[0].operator != '+=' and statement_nested.update[0].operator != '-=':
-                                        is_log = True
+
+                depth = self.loops_depth(statement) + 1    
+                if isinstance(statement, For):            
+                    if depth == 1 and len(statement.update) == 1:
+                        if isinstance(statement.update[0], Assignment):
+                            if self.is_logarithmic(statement):
+                                is_log = True
+                    elif depth == 2 and len(statement.update) == 1:
+                        if isinstance(statement.update[0], Assignment):
+                            if self.is_logarithmic(statement):
+                                is_log = True
+                        if isinstance(statement.body, Block):
+                            for statement_nested in statement.body:
+                                if isinstance(statement_nested, For):
+                                    if isinstance(statement_nested.update[0], Assignment) and len(statement_nested.update) == 1:
+                                        if self.is_logarithmic(statement_nested):
+                                            is_log = True
 
             statement_complexity_lst.append(StatementComplexity(depth, is_log))
 
