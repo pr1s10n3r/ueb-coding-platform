@@ -41,12 +41,11 @@ class Complexity:
     def get_method_variable(self, variable: VariableDeclaration):
         methods = []
         for variablede_declarator in variable.variable_declarators:
-            if isinstance(variablede_declarator, VariableDeclarator):
-                if isinstance(variablede_declarator.initializer, MethodInvocation):
-                    if variablede_declarator.initializer.name in self.methods_created_by_user:
-                        methods.append(variablede_declarator.initializer.name)
-                    methods_nested = self.get_method_args(variablede_declarator.initializer)
-                    methods = concat(methods, methods_nested)
+            if isinstance(variablede_declarator, VariableDeclarator) and isinstance(variablede_declarator.initializer, MethodInvocation):
+                if variablede_declarator.initializer.name in self.methods_created_by_user:
+                    methods.append(variablede_declarator.initializer.name)
+                methods_nested = self.get_method_args(variablede_declarator.initializer)
+                methods = concat(methods, methods_nested)
         return methods
 
     def get_methods_if(self, statement: IfThenElse):
@@ -167,9 +166,8 @@ class Complexity:
     def check_infinity_loop(self, loop: Block | For | While | DoWhile | ForEach):
         if isinstance(loop, Block):
             for statement in loop.statements:
-                if isinstance(statement, IfThenElse):
-                    if statement.if_false is not None:
-                        self.loops_depth(statement.if_false)
+                if isinstance(statement, IfThenElse) and statement.if_false is not None:
+                    self.loops_depth(statement.if_false)
                 elif isinstance(statement, (For, ForEach, While, DoWhile)):
                     if self.infinity_loop(statement):
                         return True
@@ -237,10 +235,8 @@ class Complexity:
                                 is_log = True
                         if isinstance(statement.body, Block):
                             for statement_nested in statement.body:
-                                if isinstance(statement_nested, For):
-                                    if isinstance(statement_nested.update[0], Assignment) and len(statement_nested.update) == 1:
-                                        if self.is_logarithmic(statement_nested):
-                                            is_log = True
+                                if isinstance(statement_nested, For) and isinstance(statement_nested.update[0], Assignment) and len(statement_nested.update) == 1 and self.is_logarithmic(statement_nested):
+                                    is_log = True
 
             statement_complexity_lst.append(StatementComplexity(depth, is_log))
 
