@@ -1,6 +1,6 @@
 <script>
   import { goToTabById, Headers } from "../stores/header";
-  import { setFiles } from "../stores/request";
+  import { addSourceFile, clearSourceFiles } from "../stores/request";
 
   let filesCount = 0;
   let uploadedFiles = [];
@@ -32,16 +32,15 @@
         fileNameParts[fileNameParts.length - 1] === "java"
       ) {
         uploadedFiles.push(dtFiles[i]);
+        console.log(`uploadedFiles length: ${uploadedFiles.length}`);
+        // console.log(`File ${dtFiles[i].name} added`);
+        addSourceFile(dtFiles[i]);
         filesCount++;
       } else {
         invalidFileDragged = true;
-        uploadedFiles = [];
+        clearSourceFiles();
         break;
       }
-    }
-
-    if (!invalidFileDragged) {
-      setFiles(uploadedFiles);
     }
   }
 
@@ -65,7 +64,7 @@
         on:drop={onFileDropped}
         on:dragover={onDragOver}
       >
-        {#if uploadedFiles.length === 0}
+        {#if !filesCount}
           <div class="empty-icon">
             <i class="icon icon-link" />
           </div>

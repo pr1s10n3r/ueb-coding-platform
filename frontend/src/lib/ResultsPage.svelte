@@ -1,28 +1,45 @@
 <script>
   import { onMount } from "svelte";
   import axios from "axios";
-  import { reqFormData } from "../stores/request";
-
-  let loading = true;
+  import { reqFormData, reqSourceFiles } from "../stores/request";
 
   let reqFd = null;
   reqFormData.subscribe((value) => {
     reqFd = value;
   });
 
-  onMount(async () => {
-    const { status, data } = await axios.post(
-      `${import.meta.env.VITE_BACKEND_BASE_URL}/api/dummy`,
-      reqFd,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      }
-    );
+  let reqSources = null;
+  reqSourceFiles.subscribe((value) => {
+    reqSources = value;
+  });
 
-    if (status !== 200) {
-      // TODO: Handle error
-      console.error(`bad response from server: ${status}: ${data}`);
-    }
+  let done = false;
+  let results = [];
+
+  onMount(async () => {
+    reqSources.forEach(async (file) => {
+      reqFd.set("file", file);
+
+      const { status, data } = await axios.post(
+        `${import.meta.env.VITE_BACKEND_BASE_URL}/api/dummy/`,
+        reqFd,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      if (status !== 200) {
+        // TODO: Handle error
+        console.error(`bad response from server: ${status}: ${data}`);
+      }
+
+      let result = data;
+      result.filename = file.name;
+      result.input = reqFd.get("input");
+      results.push(result);
+    });
+
+    done = true;
   });
 
   function onExportButtonPress(evt) {
@@ -33,7 +50,7 @@
 <div class="container">
   <h1>Tus Resultados</h1>
 
-  {#if loading}
+  {#if !done}
     <p>Estamos cargando...</p>
   {:else}
     <table class="table table-striped table-hover">
@@ -49,15 +66,17 @@
         </tr>
       </thead>
       <tbody>
-        <tr class="active">
-          <td>Quicksort.java</td>
-          <td>0.02s</td>
-          <td>10 8 5 54 1 2 7 87</td>
-          <td>1 2 5 7 8 10 54 87</td>
-          <td>1 2 5 7 8 10 54 87</td>
-          <td>O(log n)</td>
-          <td>O(log n)</td>
-        </tr>
+        {#each results as r}
+          <tr class="active">
+            <td>{r.filename}</td>
+            <td>{r.time.actual}</td>
+            <td>{r.input}</td>
+            <td>{r.output.expected}</td>
+            <td>{r.output.actual}</td>
+            <td>{r.complexity.expected}</td>
+            <td>{r.complexity.actual}</td>
+          </tr>
+        {/each}
       </tbody>
     </table>
 

@@ -1,6 +1,18 @@
 import { writable } from "svelte/store";
 
 export const reqFormData = writable(new FormData());
+export const reqSourceFiles = writable([]);
+
+export function addSourceFile(file) {
+  reqSourceFiles.update((files) => {
+    files.push(file);
+    return files;
+  });
+}
+
+export function clearSourceFiles() {
+  reqSourceFiles.set([]);
+}
 
 export function setFiles(files) {
   reqFormData.update((fd) => {
