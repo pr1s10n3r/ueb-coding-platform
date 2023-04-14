@@ -1,7 +1,7 @@
+import os
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from api.serializers import DummySerializer
-from django.core.files.storage import FileSystemStorage
 from api.resolvers.complexity import Complexity
 from api.resolvers.organizer import Organizer
 from api.resolvers.script import Script
@@ -25,30 +25,31 @@ class DummyViewSet(viewsets.ViewSet):
         if serializer.is_valid():
             data_dict = serializer.validated_data
             program_input = data_dict["input"]
+            program_output = data_dict["output"]
             program_function = data_dict["function"]
             program_time = data_dict["time"]
             program_complexity = data_dict["complexity"]
-            
+
             program_dir, filename = organizer.resolve(data_dict["file"])
-            full_path = program_dir + "/" + filename
-            complexity_comp = complexity.resolve(full_path, program_function)
+            full_path = os.path.join(program_dir, filename)
+            error, complexity_comp = complexity.resolve(full_path, program_function)
             script.resolve(program_dir, program_input)
             docker.resolve("11", program_input, program_dir, filename, script.bash_filename)
-            time = measurer.resolve(program_dir, script.env_filename)
+            time, output = measurer.resolve(program_dir, script.env_filename)
             cleaner.resolve(program_dir)
             return Response({
-                'function': program_function,
-                'input': program_input,
-                'success': True,
-                'complexity': {
-                    'expected': program_complexity,
-                    'actual': complexity_comp
+                "complexity": {
+                    "expected": program_complexity,
+                    "actual": complexity_comp
                 },
-                'time': {
-                    'expected': program_time,
-                    'actual': time
+                "time": {
+                    "expected": program_time,
+                    "actual": time
                 },
-                'output': 'Not implemented'
+                "output": {
+                    "expected": program_output,
+                    "actual": output
+                }
             })
         else:
             return Response(serializer.errors,

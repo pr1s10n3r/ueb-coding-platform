@@ -6,13 +6,7 @@ class DummySerializer(serializers.Serializer):
     time = serializers.FloatField(required=False)
     input = serializers.CharField(required=False, max_length=200)
     complexity = serializers.ChoiceField(
-        choices=[
-            'constant',
-            'logarithmic',
-            'linear',
-            'Nlogarithmic',
-            'quadratic',
-            'cubic',
-            'polynomial'
-        ], required=False)
+        choices=["constant", "linear", "linearithmic", "quadratic", "cubic"],
+        required=False,
+    )
     function = serializers.CharField(max_length=200, required=False)

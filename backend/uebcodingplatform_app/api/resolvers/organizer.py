@@ -1,16 +1,13 @@
 from django.core.files.storage import FileSystemStorage
-import datetime, os
+import uuid, os
 
 class Organizer:
 
     filename = "main.java"
     tmpdir = "/tmp/"
-    dtformat = ("%Y%m%d%H%M%S")
 
     def resolve(self, file):
-        now = datetime.datetime.now()
-        folder_name = now.strftime(self.dtformat)
-        folder_path = os.path.join(self.tmpdir, folder_name)
+        folder_path = os.path.join(self.tmpdir, str(uuid.uuid4()))
         os.makedirs(folder_path)
         try:
             fs = FileSystemStorage(location=folder_path)

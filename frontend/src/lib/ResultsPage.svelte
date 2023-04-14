@@ -1,28 +1,36 @@
 <script>
   import { onMount } from "svelte";
   import axios from "axios";
-  import { reqFormData, reqSourceFiles } from "../stores/request";
+  import { reqFormData, clearRequestData } from "../stores/request";
+  import { setError } from "../stores/error";
+  import { goToTabById, Headers } from "../stores/header";
+
+  let loading = true;
+  let success = [];
+  let error = [];
 
   let reqFd = null;
   reqFormData.subscribe((value) => {
     reqFd = value;
   });
 
-  let reqSources = null;
-  reqSourceFiles.subscribe((value) => {
-    reqSources = value;
-  });
+  function onQualifyOtherBatch(evt) {
+    evt.preventDefault();
 
-  let done = false;
-  let results = [];
+    // NOTE (@astagg): IMPORTANT TO CLEAR ALL VARIABLES
+    clearRequestData();
 
-  onMount(async () => {
-    reqSources.forEach(async (file) => {
-      reqFd.set("file", file);
+    goToTabById(Headers.Loader);
+  }
 
+  async function sendToServer(formData, file) {
+    const fd = formData.valueOf();
+    fd.set("file", file);
+
+    try {
       const { status, data } = await axios.post(
         `${import.meta.env.VITE_BACKEND_BASE_URL}/api/dummy/`,
-        reqFd,
+        fd,
         {
           headers: { "Content-Type": "multipart/form-data" },
         }
@@ -31,26 +39,31 @@
       if (status !== 200) {
         // TODO: Handle error
         console.error(`bad response from server: ${status}: ${data}`);
+      } else {
+        data.name = file.name;
+        success = [...success, data];
       }
-
-      let result = data;
-      result.filename = file.name;
-      result.input = reqFd.get("input");
-      results.push(result);
-    });
-
-    done = true;
-  });
-
-  function onExportButtonPress(evt) {
-    // TODO: Export results to Excel
+    } catch (err) {
+      error = [...error, err];
+      console.error(err);
+      setError(err.message);
+      goToTabById(Headers.Error);
+    }
   }
+
+  onMount(async () => {
+    const reqFiles = reqFd.getAll("file");
+    for (const rFile of reqFiles) {
+      await sendToServer(reqFd, rFile);
+    }
+    loading = false;
+  });
 </script>
 
 <div class="container">
   <h1>Tus Resultados</h1>
 
-  {#if !done}
+  {#if success.length === 0}
     <p>Estamos cargando...</p>
   {:else}
     <table class="table table-striped table-hover">
@@ -58,7 +71,6 @@
         <tr>
           <th>Código Evaluado</th>
           <th>Tiempo de Ejecución</th>
-          <th>Entradas</th>
           <th>Salidas Esperadas</th>
           <th>Salidas Obtenidas</th>
           <th>Complejidad Esperada</th>
@@ -66,27 +78,41 @@
         </tr>
       </thead>
       <tbody>
-        {#each results as r}
+        {#each success as s}
           <tr class="active">
-            <td>{r.filename}</td>
-            <td>{r.time.actual}</td>
-            <td>{r.input}</td>
-            <td>{r.output.expected}</td>
-            <td>{r.output.actual}</td>
-            <td>{r.complexity.expected}</td>
-            <td>{r.complexity.actual}</td>
+            <td>{s.name}</td>
+            <td
+              class={s.time.expected > 0 &&
+              s.time.actual / 1000 > s.time.expected
+                ? "text-error"
+                : "text-success"}>{s.time.actual / 1000}s</td
+            >
+            <td>{s.output.expected}</td>
+            <td
+              class={s.output.expected !== "" &&
+              s.output.expected === s.output.actual
+                ? "text-success"
+                : "text-error"}>{s.output.actual}</td
+            >
+            <td>{s.complexity.expected}</td>
+            <td
+              class={s.complexity.expected !== "" &&
+              s.complexity.expected === s.complexity.actual
+                ? "text-success"
+                : "text-error"}>{s.complexity.actual}</td
+            >
           </tr>
         {/each}
       </tbody>
     </table>
 
-    <div class="controls mt-2 float-right">
-      <button on:click={onExportButtonPress} class="btn"
-        >Calificar otro lote <i class="icon icon-refresh" /></button
-      >
+    {#if loading}
+      <div class="loading loading-lg" />
+    {/if}
 
-      <button on:click={onExportButtonPress} class="btn btn-success"
-        >Exportar a Excel <i class="icon icon-download" /></button
+    <div class="controls mt-2 float-right">
+      <button on:click={onQualifyOtherBatch} class="btn"
+        >Calificar otro lote <i class="icon icon-refresh" /></button
       >
     </div>
   {/if}

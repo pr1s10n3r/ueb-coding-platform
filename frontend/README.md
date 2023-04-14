@@ -15,7 +15,7 @@ Also, you will need to create a local `.env.local` file for testing purposes. He
 
 ```shell
 # .env.local
-BACKEND_BASE_URL=http://localhost:8000
+VITE_BACKEND_BASE_URL=http://localhost:8000
 ```
 
 ## Build
