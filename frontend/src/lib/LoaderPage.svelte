@@ -1,4 +1,5 @@
 <script>
+  import { setFiles } from "../stores/request";
   import { goToTabById, Headers } from "../stores/header";
   import { addSourceFile, clearSourceFiles } from "../stores/request";
 
@@ -36,11 +37,16 @@
         // console.log(`File ${dtFiles[i].name} added`);
         addSourceFile(dtFiles[i]);
         filesCount++;
+        console.log(`File setted`);
       } else {
         invalidFileDragged = true;
         clearSourceFiles();
         break;
       }
+    }
+
+    if (!invalidFileDragged) {
+      setFiles(uploadedFiles);
     }
   }
 
