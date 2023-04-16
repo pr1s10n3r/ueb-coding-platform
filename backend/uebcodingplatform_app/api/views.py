@@ -25,7 +25,6 @@ class DummyViewSet(viewsets.ViewSet):
         serializer = DummySerializer(data=req.data)
         if serializer.is_valid():
             data_dict = serializer.validated_data
-            print(data_dict)
             program_input = data_dict["input"]
             program_output = data_dict["output"]
             program_function = data_dict["function"]
