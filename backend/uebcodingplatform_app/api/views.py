@@ -14,6 +14,7 @@ class DummyViewSet(viewsets.ViewSet):
         return Response('Ueb')
 
     def create(self, req):
+        javaVersion = "21-jdk-slim-bullseye"
         complexity = Complexity()
         organizer = Organizer()
         script = Script()
@@ -24,6 +25,7 @@ class DummyViewSet(viewsets.ViewSet):
         serializer = DummySerializer(data=req.data)
         if serializer.is_valid():
             data_dict = serializer.validated_data
+            print(data_dict)
             program_input = data_dict["input"]
             program_output = data_dict["output"]
             program_function = data_dict["function"]
@@ -32,9 +34,12 @@ class DummyViewSet(viewsets.ViewSet):
 
             program_dir, filename = organizer.resolve(data_dict["file"])
             full_path = os.path.join(program_dir, filename)
-            error, complexity_comp = complexity.resolve(full_path, program_function)
+            if program_function == "":
+                complexity_comp = ""
+            else:
+                error, complexity_comp = complexity.resolve(full_path, program_function)
             script.resolve(program_dir, program_input)
-            docker.resolve("11", program_input, program_dir, filename, script.bash_filename)
+            docker.resolve(javaVersion, program_input, program_dir, filename, script.bash_filename)
             time, output = measurer.resolve(program_dir, script.env_filename)
             cleaner.resolve(program_dir)
             return Response({
