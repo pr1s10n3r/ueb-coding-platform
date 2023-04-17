@@ -13,7 +13,7 @@
 
     setEvaluationCriteria(
       inputFormField,
-      expectedOutputField,
+      expectedOutputField.trim(),
       funcExpectedComplexity,
       expectedTimeField,
       funcName
