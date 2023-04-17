@@ -71,7 +71,7 @@ class Complexity:
             methods = concat(methods, methods_nested)
         
         if isinstance(statement.if_false, Block):
-            for false_statement in statement.if_true.statements:    
+            for false_statement in statement.if_false.statements:    
                 if isinstance(false_statement, (For, ForEach, While, DoWhile)):
                     methods_nested = self.get_methods_loops(false_statement)
                     methods = concat(methods, methods_nested)
