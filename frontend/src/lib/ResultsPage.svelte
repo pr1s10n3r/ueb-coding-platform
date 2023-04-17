@@ -8,6 +8,8 @@
   let loading = true;
   let success = [];
   let error = [];
+  let isComplexityExpected = true,
+    isOutputExpected = true;
 
   let reqFd = null;
   reqFormData.subscribe((value) => {
@@ -42,6 +44,13 @@
         // TODO: Handle error
         console.error(`bad response from server: ${status}: ${data}`);
       } else {
+        if (isComplexityExpected && data.complexity.expected === "") {
+          isComplexityExpected = false;
+        }
+        if (isOutputExpected && data.output.expected === "") {
+          isOutputExpected = false;
+        }
+
         data.name = file.name;
         data.output.actual = data.output.actual.trim();
         success = [...success, data];
@@ -76,10 +85,14 @@
         <tr>
           <th>Código Evaluado</th>
           <th>Tiempo de Ejecución</th>
-          <th>Salidas Esperadas</th>
+          {#if isOutputExpected}
+            <th>Salidas Esperadas</th>
+          {/if}
           <th>Salidas Obtenidas</th>
-          <th>Complejidad Esperada</th>
-          <th>Complejidad Obtenida</th>
+          {#if isComplexityExpected}
+            <th>Complejidad Esperada</th>
+            <th>Complejidad Obtenida</th>
+          {/if}
         </tr>
       </thead>
       <tbody>
@@ -92,20 +105,25 @@
                 ? "text-error"
                 : "text-success"}>{s.time.actual / 1000}s</td
             >
-            <td>{s.output.expected}</td>
+            {#if isOutputExpected}
+              <td>{s.output.expected}</td>
+            {/if}
             <td
-              class={s.output.expected !== "" &&
+              class={isOutputExpected &&
+              s.output.expected !== "" &&
               s.output.expected === s.output.actual
                 ? "text-success"
                 : "text-error"}>{s.output.actual}</td
             >
-            <td>{s.complexity.expected}</td>
-            <td
-              class={s.complexity.expected !== "" &&
-              s.complexity.expected === s.complexity.actual
-                ? "text-success"
-                : "text-error"}>{s.complexity.actual}</td
-            >
+            {#if isComplexityExpected}
+              <td>{s.complexity.expected}</td>
+              <td
+                class={s.complexity.expected !== "" &&
+                s.complexity.expected === s.complexity.actual
+                  ? "text-success"
+                  : "text-error"}>{s.complexity.actual}</td
+              >
+            {/if}
           </tr>
         {/each}
       </tbody>
