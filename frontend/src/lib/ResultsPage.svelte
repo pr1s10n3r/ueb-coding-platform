@@ -43,6 +43,7 @@
         console.error(`bad response from server: ${status}: ${data}`);
       } else {
         data.name = file.name;
+        data.output.actual = data.output.actual.trim();
         success = [...success, data];
       }
     } catch (err) {
